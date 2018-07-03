@@ -55,8 +55,8 @@ def general_model(df, pred_var, cont_vars=[], cat_vars=[], algorithm='rf', folds
     # treats every non-target variable as a feature
     feat_vars = [var for var in list(df.columns) if var != pred_var]
 
-    X = df[feat_vars].as_matrix()
-    y = df[pred_var].as_matrix()
+    X = df[feat_vars].values
+    y = df[pred_var].values
 
     # keeps track of feature importance/coefficients
     feat_info = np.zeros((1, len(df[feat_vars].columns)))

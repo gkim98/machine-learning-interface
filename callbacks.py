@@ -46,10 +46,8 @@ def update_metrics_graph(n, cats, conts, target, size, alg, content, filename, d
     if conts is None : conts=[]
     min_features = size[0]
 
-    test = lambda x: print('yay')
-
     # pass in model_evaluation function with available parameters
-    get_results = lambda x: model_evaluation(x, target, test, min_features, alg, cats, conts)
+    get_results = lambda x: model_evaluation(x, target, graph_data, min_features, alg, cats, conts)
     return parse_contents(content, filename, date, get_results)
 
 def graph_data(df):
@@ -60,7 +58,12 @@ def graph_data(df):
         data=[go.Scatter(
             x=x,
             y=y,
-            mode='markers'
+            mode='markers',
+            marker=dict(
+                size=15,
+                opacity=0.5,
+                line=dict(width=0.5, color='white')
+            )
         )],
         layout=go.Layout(
             xaxis=dict(title='auc'),

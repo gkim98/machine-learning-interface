@@ -78,7 +78,7 @@ algorithm_radio = dcc.RadioItems(id='algorithm-radio',
 def create_slider(num_features=1):
     return dcc.RangeSlider(
         id='feature-slider',
-        min=0, max=num_features, step=1, value=[0, num_features], 
+        min=1, max=num_features, step=1, value=[1, num_features], 
         marks={i: i for i in range(num_features+1)}
     )
 

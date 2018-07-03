@@ -1,7 +1,9 @@
 from app import app
 from helpers import parse_contents
 from components import create_dropdowns, create_slider
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
+from model_evaluation import model_evaluation
+import plotly.graph_objs as go
 
 
 @app.callback(Output('dropdown-holder', 'children'),
@@ -28,4 +30,42 @@ def update_slider(cat_options, cont_options):
     num_features = len(cat_options) + len(cont_options)
     return create_slider(num_features)
     
-    
+
+@app.callback(Output('metrics-graph', 'figure'),
+    [Input('run-button', 'n_clicks')],
+    [State('cat-dropdown', 'value'),
+    State('cont-dropdown', 'value'),
+    State('target-dropdown', 'value'),
+    State('feature-slider', 'value'),
+    State('algorithm-radio', 'value'),
+    State('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    State('upload-data', 'last_modified')])
+def update_metrics_graph(n, cats, conts, target, size, alg, content, filename, date):
+    if cats is None : cats=[]
+    if conts is None : conts=[]
+    min_features = size[0]
+
+    test = lambda x: print('yay')
+
+    # pass in model_evaluation function with available parameters
+    get_results = lambda x: model_evaluation(x, target, test, min_features, alg, cats, conts)
+    return parse_contents(content, filename, date, get_results)
+
+def graph_data(df):
+    x=df['auc']
+    y=df['fscore']
+
+    return dict(
+        data=[go.Scatter(
+            x=x,
+            y=y,
+            mode='markers'
+        )],
+        layout=go.Layout(
+            xaxis=dict(title='auc'),
+            yaxis=dict(title='f-score'),
+            margin=dict(r='0'),
+            hovermode='closest'
+        )
+    )

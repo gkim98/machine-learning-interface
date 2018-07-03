@@ -22,35 +22,5 @@ app.layout  = html.Div([
     
 ])
 
-
-
-
-
-
-
-
-
-# # populates the dropdowns with variable options
-# @app.callback(Output('cat-dropdown', 'options'),
-#     [Input('upload-data', 'contents'),
-#     Input('upload-data', 'filename'),
-#     Input('upload-data', 'last_modified')])
-# def fill_cat_dropdown(content, filename, data):
-#     return get_variables(content, filename, data)
-
-# @app.callback(Output('cont-dropdown', 'options'),
-#     [Input('upload-data', 'contents'),
-#     Input('upload-data', 'filename'),
-#     Input('upload-data', 'last_modified')])
-# def fill_cont_dropdown(content, filename, data):
-#     return get_variables(content, filename, data)
-
-# @app.callback(Output('target-dropdown', 'options'),
-#     [Input('upload-data', 'contents'),
-#     Input('upload-data', 'filename'),
-#     Input('upload-data', 'last_modified')])
-# def fill_target_dropdown(content, filename, data):
-#     return get_variables(content, filename, data)
-
 if __name__ == '__main__':
     app.run_server()

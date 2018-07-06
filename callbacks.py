@@ -6,11 +6,10 @@ import json
 import pandas as pd
 from six.moves.urllib.parse import quote
 
-from application import app
+from app import app
 from helpers import parse_contents
 from components import create_dropdowns, create_slider, metrics_graph
 from model_evaluation import model_evaluation
-
 
 # populates dropdown with feature options
 @app.callback(Output('dropdown-holder', 'children'),

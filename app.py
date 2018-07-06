@@ -1,16 +1,15 @@
+import dash
 import dash_core_components as dcc   
 import dash_html_components as html 
 from dash.dependencies import Input, Output 
 
-from app import app 
 from components import file_uploader
 from components import create_dropdowns, algorithm_radio, slider_holder, subset_checkbox
 from components import run_button
 from components import metrics_graph, marker_info
 from components import results_holder, download_button
 import callbacks
-
-import dash 
+ 
 
 app = dash.Dash(__name__)
 server = app.server 

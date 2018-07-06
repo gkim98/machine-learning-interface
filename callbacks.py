@@ -90,7 +90,7 @@ def graph_data(df):
         layout=go.Layout(
             xaxis=dict(title='auc'),
             yaxis=dict(title='f-score'),
-            margin=dict(r='0'),
+            margin=dict(r=0),
             hovermode='closest'
         )
     )

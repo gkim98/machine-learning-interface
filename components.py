@@ -126,7 +126,7 @@ metrics_graph = html.Div(dcc.Graph(id='metrics-graph',
       layout=go.Layout(
           xaxis=dict(title='auc'),
           yaxis=dict(title='f-score'),
-          margin=dict(r='0')
+          margin=dict(r=0)
       )
   ), config=dict(displayModeBar=False)  
 ), style=dict(

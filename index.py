@@ -11,7 +11,7 @@ from components import results_holder, download_button
 import callbacks
 
 
-app.layout  = html.Div([
+app.layout = html.Div([
     file_uploader,
     html.Div(id='dropdown-holder', children=create_dropdowns(), 
         style=dict(width='100%')),

@@ -10,6 +10,12 @@ from components import metrics_graph, marker_info
 from components import results_holder, download_button
 # import callbacks
 
+import dash
+
+app = dash.Dash(__name__)
+server = app.server 
+app.scripts.config.serve_locally=True
+app.config.suppress_callback_exceptions=True 
 
 app.layout = html.Div([
     file_uploader,

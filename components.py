@@ -28,7 +28,8 @@ file_uploader = dcc.Upload(
 # dropdown for categorical variables
 def create_cat_dropdown(options=[]):
     return html.Div(dcc.Dropdown(id='cat-dropdown',
-        options=options, multi=True), style=dict(
+        options=options, multi=True, placeholder='Categorical Features'), 
+        style=dict(
             width='40%',
             marginTop='10px',
             marginLeft='2.5%',
@@ -39,7 +40,8 @@ def create_cat_dropdown(options=[]):
 # dropdown for continuous variables
 def create_cont_dropdown(options=[]):
     return html.Div(dcc.Dropdown(id='cont-dropdown',
-        options=options, multi=True), style=dict(
+        options=options, multi=True, placeholder='Continuous Features'), 
+        style=dict(
             width='40%',
             marginTop='10px',
             marginRight='1%',
@@ -49,7 +51,8 @@ def create_cont_dropdown(options=[]):
 # dropdown for target variable
 def create_target_dropdown(options=[]):
     return html.Div(dcc.Dropdown(id='target-dropdown',
-        options=options, multi=False), style=dict(
+        options=options, multi=False, placeholder='Target Variable'), 
+        style=dict(
             width='13%',
             marginTop='10px',
             marginRight='2.5%',
@@ -65,17 +68,31 @@ def create_dropdowns(options=[]):
     ]
 
 # radio items for algorithm choice
-algorithms=[('Logistic Regression', 'lr'), ('Random Forest', 'rf'), ('Support Vector Machine', 'svm')]
+algorithms=[('Logistic Regression', 'lr'), ('Random Forest', 'rf'), ('SVM', 'svm')]
 algorithm_radio = dcc.RadioItems(id='algorithm-radio', 
     options=[{'label': i[0], 'value': i[1]} for i in algorithms], value='lr', 
     labelStyle=dict(
         paddingRight='1%'
     ), style=dict(
-        marginLeft='2.5%', marginTop='10px', width='100%'
+        marginLeft='2.5%',
+        width='50%'
+    ))
+
+# checkbox for subsets
+subset_checkbox = dcc.Checklist(id='subset-checkbox', 
+    options=[{'label': 'No Subsets', 'value': 'no_subsets'}], values=['no_subsets'],
+    style=dict(
+        marginRight='2.5%'
     ))
 
 # range slider for number of features in model
-def create_slider(num_features=1):
+def create_slider(num_features=1, subsets='no_subsets'):
+    if subsets == 'no_subsets':
+        return dcc.RangeSlider(
+            id='feature-slider', disabled=True,
+            min=1, max=num_features, step=1, value=[num_features, num_features], 
+            marks={i: i for i in range(num_features+1)}
+        )
     return dcc.RangeSlider(
         id='feature-slider',
         min=1, max=num_features, step=1, value=[1, num_features], 
@@ -115,3 +132,21 @@ metrics_graph = html.Div(dcc.Graph(id='metrics-graph',
 ), style=dict(
     width='60%'
 ))
+
+# displays info of marker
+marker_info = html.Div(id='marker-info',
+    style=dict(
+        width='35%',
+        marginLeft='2.5%',
+        marginTop='100px'
+    ))
+
+# hidden div for storing result dataframe
+results_holder = html.Div(id='results-holder', children=[],
+    style=dict(display='none'))
+
+# button for downloading results
+download_button = html.Div(html.A(
+    'Download Results', id='download-button',
+    download='results.csv', href='', target='_blank' 
+), style=dict(marginLeft='2.5%'))

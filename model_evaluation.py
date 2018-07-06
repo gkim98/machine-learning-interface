@@ -19,7 +19,7 @@ import general_model as gm
         - cat_vars: list of categorical variables
         - cont_vars: list of continuous variables
 """
-def model_evaluation(df, target_var, action, min_feats=1, algorithm='rf', cat_vars=[], cont_vars=[]):
+def model_evaluation(df, target_var, min_feats=1, algorithm='rf', cat_vars=[], cont_vars=[]):
     total_features = cat_vars + cont_vars
     
     # keeps track of results
@@ -42,7 +42,7 @@ def model_evaluation(df, target_var, action, min_feats=1, algorithm='rf', cat_va
             
             # handles feature importance field
             ordered_feat_importance = feat_importance_df.sort_values('Weight', ascending=False)
-            ordered_weights = ordered_feat_importance['Weight']
+            ordered_weights = ordered_feat_importance['Weight'].map(lambda x: round(x, 4))
             ordered_feats = ordered_feat_importance['Feature']
             
             import_array = []
@@ -54,11 +54,14 @@ def model_evaluation(df, target_var, action, min_feats=1, algorithm='rf', cat_va
             results = results.append(pd.DataFrame({'features': feature_string, 'fscore': fscore, 
                                                    'auc': auc_score, 'num_features': num_feats, 'feat_importance': import_string}, index=[0]))
     
-    # sorts dataframe in descending order of f-score
-    results = results.sort_values('fscore', ascending=False)
-    # columns in right order
-    col_order = ['fscore', 'features'] + [col for col in results.columns if col not in ['fscore', 'features']]
-    results = results[col_order]
+    try:
+        # sorts dataframe in descending order of f-score
+        results = results.sort_values('fscore', ascending=False)
+        # columns in right order
+        col_order = ['fscore', 'features'] + [col for col in results.columns if col not in ['fscore', 'features']]
+        results = results[col_order]
+    except:
+        pass
     
     print(results)
-    return action(results)
+    return results

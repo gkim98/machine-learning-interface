@@ -36,7 +36,7 @@ GRID_DEFAULT = {
         - F-score of model
         - dictionary of metrics
 """
-def general_model(df, pred_var, cont_vars=[], cat_vars=[], algorithm='rf', folds=10, iterations=3):
+def general_model(df, pred_var, cont_vars=[], cat_vars=[], algorithm='rf', folds=5, iterations=3):
     df = prepare_df(df, pred_var, cont_vars, cat_vars)
 
     avg_pos_prec = 0

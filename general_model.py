@@ -7,6 +7,7 @@ import pandas as pd
 from sklearn.model_selection import RepeatedStratifiedKFold
 from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV
+from xgboost import XGBClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
@@ -36,7 +37,7 @@ GRID_DEFAULT = {
         - F-score of model
         - dictionary of metrics
 """
-def general_model(df, pred_var, cont_vars=[], cat_vars=[], algorithm='rf', folds=5, iterations=3):
+def general_model(df, pred_var, cont_vars=[], cat_vars=[], algorithm='rf', folds=5, iterations=100):
     df = prepare_df(df, pred_var, cont_vars, cat_vars)
 
     avg_pos_prec = 0
@@ -44,12 +45,15 @@ def general_model(df, pred_var, cont_vars=[], cat_vars=[], algorithm='rf', folds
     avg_neg_prec = 0
     avg_neg_rec = 0
     auc_score = 0
+    avg_train_error = 0
+    avg_test_error = 0
 
     # maps algorithm parameter to algorithm function
     alg_map = {
         'svm': train_svm_model,
         'rf': train_rf_model,
-        'lr': train_lr_model
+        'lr': train_lr_model,
+        'xgb': train_xgb_model
     }
 
     # treats every non-target variable as a feature
@@ -65,7 +69,7 @@ def general_model(df, pred_var, cont_vars=[], cat_vars=[], algorithm='rf', folds
     for train_index, test_index in rskf.split(X, y):
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
-        (tn, fp, fn, tp), weights, temp_auc = alg_map[algorithm](X_train, y_train, X_test, y_test)
+        (tn, fp, fn, tp), weights, temp_auc, train_error, test_error = alg_map[algorithm](X_train, y_train, X_test, y_test)
 
         if algorithm != 'svm' : feat_info += weights
         auc_score += temp_auc
@@ -75,12 +79,18 @@ def general_model(df, pred_var, cont_vars=[], cat_vars=[], algorithm='rf', folds
         avg_neg_prec += tn / (tn + fn)
         avg_neg_rec += tn / (tn + fp)
 
+        avg_train_error += train_error
+        avg_test_error += test_error
+
     # calculates average precision and recall
     avg_pos_prec /= (folds * iterations)
     avg_pos_rec /= (folds * iterations)
     avg_neg_prec /= (folds * iterations)
     avg_neg_rec /= (folds * iterations)
     auc_score /= (folds * iterations)
+    avg_train_error /= (folds * iterations)
+    avg_test_error /= (folds * iterations)
+    print('Train error: {}, Test error: {}'.format(round(avg_train_error, 3), round(avg_test_error, 3)))
 
     # gets average of weights and displays
     if algorithm != 'svm':
@@ -129,7 +139,7 @@ def train_rf_model(X_train, y_train, X_test, y_test):
     return metrics, feat_importances, auc_score
 
 
-# trains one iteration of 
+# trains one iteration of logistic regression model
 def train_lr_model(X_train, y_train, X_test, y_test):
     model = LogisticRegression()
     model.fit(X_train, y_train)
@@ -142,7 +152,30 @@ def train_lr_model(X_train, y_train, X_test, y_test):
 
     auc_score = calc_auc(y_test, predictions)
 
-    return metrics, coefficients, auc_score
+    train_error = model.score(X_train, y_train)
+    test_error = model.score(X_test, y_test)
+
+    return metrics, coefficients, auc_score, train_error, test_error
+
+# trains one iteration of xgboost model
+def train_xgb_model(X_train, y_train, X_test, y_test):
+    model = XGBClassifier(
+        n_estimators=35,
+        min_child_weight=5
+    )
+
+    model.fit(X_train, y_train)
+    
+    pred = model.predict(X_test)
+    
+    auc_score = calc_auc(y_test, pred)
+    metrics = confusion_matrix(y_test, pred).ravel()
+    feat_importances = model.feature_importances_
+    
+    train_error = model.score(X_train, y_train)
+    test_error = model.score(X_test, y_test)
+
+    return metrics, feat_importances, auc_score, train_error, test_error
 
 # calculates auc
 def calc_auc(y_test, predictions):

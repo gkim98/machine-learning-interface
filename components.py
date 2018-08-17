@@ -68,9 +68,9 @@ def create_dropdowns(options=[]):
     ]
 
 # radio items for algorithm choice
-algorithms=[('Logistic Regression', 'lr'), ('Random Forest', 'rf'), ('SVM', 'svm')]
+algorithms=[('Logistic Regression', 'lr'), ('Random Forest', 'rf'), ('SVM', 'svm'), ('XGBoost', 'xgb')]
 algorithm_radio = dcc.RadioItems(id='algorithm-radio', 
-    options=[{'label': i[0], 'value': i[1]} for i in algorithms], value='lr', 
+    options=[{'label': i[0], 'value': i[1]} for i in algorithms], value='xgb', 
     labelStyle=dict(
         paddingRight='1%'
     ), style=dict(
